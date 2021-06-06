@@ -1,3 +1,7 @@
+# Assignment 5
+# Jacob Elbaz 336068895
+# Samuel Levy 345112148
+
 def createMatrix(matrix, size, val):
     if val == 0:
         matrix = [[0 for i in range(size)] for j in range(size)]
@@ -52,33 +56,73 @@ def Mul_matrix(a, b):
     return temp
 
 
-def Linear_Method(list, xf):
-    for i in range(len(list)):
-        if list[i][0] < xf < list[i + 1][0]:
-            return (list[i][1] - list[i + 1][1]) / (list[i][0] - list[i + 1][0]) * xf + (
-                    (list[i + 1][1] * list[i][0]) - (list[i][1] * list[i + 1][0])) / (list[i][0] - list[i + 1][0])
+def Linear_Method(tab, xf):
+    for i in range(len(tab)):
+        if tab[i][0] < xf < tab[i + 1][0]:
+            return (tab[i][1] - tab[i + 1][1]) / (tab[i][0] - tab[i + 1][0]) * xf + (
+                    (tab[i + 1][1] * tab[i][0]) - (tab[i][1] * tab[i + 1][0])) / (tab[i][0] - tab[i + 1][0])
 
 
-def Polynomial_Method(list, xf):
-    result, b = 0, [list[i][1] for i in range(len(list))]
-    poly = Mul_matrix(invertMatrix(Polynomial_creation(list)), b)
+def Polynomial_Method(tab, xf):
+    result, b = 0, [tab[i][1] for i in range(len(tab))]
+    poly = Mul_matrix(invertMatrix(Polynomial_creation(tab)), b)
     for i in range(len(poly)):
         result += poly[i] * (xf ** i)
     return result
 
 
-def Lagrange_Method(list, xf):
-    sum, temp = 0, 1
-    for i in range(len(list)):
-        for j in range(len(list)):
+def Lagrange_Method(tab, xf):
+    Sum, temp = 0, 1
+    for i in range(len(tab)):
+        for j in range(len(tab)):
             if i != j:
-                temp *= (xf - list[j][0]) / ((list[i][0]) - list[j][0])
-        sum += temp * list[i][1]
+                temp *= (xf - tab[j][0]) / ((tab[i][0]) - tab[j][0])
+        Sum += temp * tab[i][1]
         temp = 1
-    return sum
+    return Sum
 
 
-def Polynomial_creation(list):
-    for i in range(len(list)):
-        list[i].insert(0, 1)
-    return [[list[i][1] ** j for j in range(len(list))] for i in range(len(list))]
+def Polynomial_creation(tab):
+    for i in range(len(tab)):
+        tab[i].insert(0, 1)
+    return [[tab[i][1] ** j for j in range(len(tab))] for i in range(len(tab))]
+
+
+def Nevil_Method(tab, xf):
+    def Nevil_P(m, n):
+        if m == n:
+            return tab[m][1]
+        else:
+            Px = ((xf - tab[m][0]) * Nevil_P(m + 1, n) - (xf - tab[n][0]) * Nevil_P(m, n - 1)) / (
+                    tab[n][0] - tab[m][0])
+            return Px
+
+    return Nevil_P(0, len(tab) - 1)
+
+
+def driver():
+    print("How much point do you want to add ?")
+    count = int(input())
+    tab = [[0 for i in range(2)] for j in range(count)]
+    for n in range(count):
+        print("x{0}= ".format(n))
+        tab[n][0] = float(input())
+        print("y{0}= ".format(n))
+        tab[n][1] = float(input())
+    print("Which point you want to know ?")
+    xf = float(input())
+    choice = 5
+    while choice > 4 or choice < 1:
+        print("Which method you want to use ?\n1.Linear\n2.Polynomial\n3.Lagrange\n4.Nevil")
+        choice = int(input())
+        if choice == 1:
+            print("Result = {}".format(Linear_Method(tab, xf)))
+        if choice == 2:
+            print("Result = {}".format(Polynomial_Method(tab, xf)))
+        if choice == 3:
+            print("Result = {}".format(Lagrange_Method(tab, xf)))
+        if choice == 4:
+            print("Result = {}".format(Nevil_Method(tab, xf)))
+
+
+driver()
